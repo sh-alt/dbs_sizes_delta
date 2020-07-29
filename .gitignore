@@ -1,3 +1,5 @@
 .vscode
 *.csv
 venv
+result.xlsx
+*xlsx*
