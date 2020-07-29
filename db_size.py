@@ -4,12 +4,24 @@ import os
 
 file1 = '18112019.csv'
 file2 = '28022020.csv'
+filenames = []
 
+def get_files():
+    #получает список файлов в директории
+    for (_, _, names) in walk("."):
+        for name in names:
+            if '.csv' in name:
+                filenames.append(name)
+        break
+    
+def select_first_file():
 
 def normalize_data_size(input_dict):
+    #метод для нормализации размеров таблиц
     units = {"B": 1, "kB": 10**3, "MB": 10**6, "GB": 10**9, "TB": 10**12}
     number, unit = [string.strip() for string in input_dict.split()]
     return int(float(number)*units[unit])
+
 
 def hreadeble_size(size):
     power = 2**10
@@ -27,7 +39,9 @@ def hreadeble_size(size):
             n += 1
         return f"{format(size, '.2f')} {power_labels[n]}"
 
+
 def create_dict(input_file):
+    #создаёт список словарей формата [{"db_name": название_бд, дата: размер_бд}]
     result = []
     with open(input_file, 'r') as csvfile:
         filereader = csv.DictReader(csvfile)
@@ -39,6 +53,7 @@ def create_dict(input_file):
 
 
 def create_set_of_names(*args):
+    #создаёт список уникальных имен баз данных
     set_of_names = set()
     for input_file in args:
         with open(input_file, 'r') as csvfile:
@@ -51,6 +66,7 @@ def create_set_of_names(*args):
 
 
 def copy_list(list1, list2):
+    #копирование списка словарей list2 в list1 построчно
     result_list = list1
     for row in result_list:
         row['28022020'] = '0 kB'
@@ -70,7 +86,9 @@ def copy_list(list1, list2):
    
 
 def deltaFunc(csv_list):
+    #добавление столбца delta в результирующую таблицу
     return csv_list['delta']
+
 
 def create_result_csv(list1, list2):
     result_list = copy_list(list1, list2)
@@ -90,15 +108,16 @@ def create_result_csv(list1, list2):
     return result_list
 
 
-def create_result_csv(*args, list_of_db_names):
-    result_dict = []
-    for input_file in args:
-        for name in list_of_db_names:
-            date = os.path.splitext(list_of_db_names)[0]
-            result_dict.append({'db_name': name, date: j})
+#def create_result_csv(*args, list_of_db_names):
+#    result_dict = []
+#    for input_file in args:
+#        for name in list_of_db_names:
+#            date = os.path.splitext(list_of_db_names)[0]
+#            result_dict.append({'db_name': name, date: j})
 
 
 def output_csv(result_list):
+    #создает результирующий csv-файл
     csv_columns = ['db_name', '18112019', '28022020', 'delta']
     csv_file = 'total.csv'
     try:
