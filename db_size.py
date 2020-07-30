@@ -1,20 +1,25 @@
 import csv
 import math
 import os
+from datetime import date
+from os import walk
+
 
 file1 = '18112019.csv'
 file2 = '28022020.csv'
-filenames = []
+filenames = {}
 
 def get_files():
     #получает список файлов в директории
     for (_, _, names) in walk("."):
         for name in names:
             if '.csv' in name:
-                filenames.append(name)
-        break
+                filenames['name'] = name
+                filenames['date'] = date.fromisoformat(str(name[:-4]))
+        continue
+    if len(filenames) != 2:
+        raise Exception('Неверное количество файлов в директории')
     
-def select_first_file():
 
 def normalize_data_size(input_dict):
     #метод для нормализации размеров таблиц
