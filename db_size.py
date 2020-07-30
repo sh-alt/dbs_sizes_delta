@@ -7,16 +7,19 @@ from os import walk
 
 file1 = '18112019.csv'
 file2 = '28022020.csv'
-filenames = {}
+filenames = []
 
 def get_files():
     #получает список файлов в директории
     for (_, _, names) in walk("."):
         for name in names:
+            _file = {}
             if '.csv' in name:
-                filenames['name'] = name
-                filenames['date'] = date.fromisoformat(str(name[:-4]))
+                _file['name'] = name
+                _file['date'] = date.fromisoformat(str(name[:-4]))
+                filenames.append(_file)
         continue
+    filenames.sort(key= lambda _file: _file['date'])
     if len(filenames) != 2:
         raise Exception('Неверное количество файлов в директории')
     
@@ -134,8 +137,13 @@ def output_csv(result_list):
     except IOError:
         print('I/O Error')
 
-list_of_names = create_set_of_names(file1, file2)
-print(list_of_names)
+# list_of_names = create_set_of_names(file1, file2)
+# print(list_of_names)
 
 #result_list = create_result_csv(dblist1, dblist2)
 #output_csv(result_list)
+
+
+if __name__ == "__main__":
+    get_files()
+    print(filenames)
