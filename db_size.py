@@ -11,6 +11,7 @@ filenames = []
 
 def get_files():
     #получает список файлов в директории
+    #сортирует их по дате по возрастанию
     for (_, _, names) in walk("."):
         for name in names:
             _file = {}
@@ -146,4 +147,5 @@ def output_csv(result_list):
 
 if __name__ == "__main__":
     get_files()
-    print(filenames)
+    r = create_dict(filenames[0])
+    print(r)
