@@ -24,7 +24,8 @@ def get_files():
 
 def normalize_data_size(input_dict):
     #метод для нормализации размеров таблиц
-    units = {"B": 1, "kB": 10**3, "MB": 10**6, "GB": 10**9, "TB": 10**12}
+    #units = {"B": 1, "kB": 10**3, "MB": 10**6, "GB": 10**9, "TB": 10**12}
+    units = {"B": 1, "kB": 2**10, "MB": 2**20, "GB": 2**30, "TB": 2**40}
     number, unit = [string.strip() for string in input_dict.split()]
     return int(float(number)*units[unit])
 
@@ -118,6 +119,7 @@ def create_result_csv(result_list):
     for row in result_list:
         row['delta'] = hreadeble_size(row['delta'])
     result_list.append(total)
+    print(result_list)
     return result_list
 
 
@@ -136,7 +138,6 @@ def output_csv(result_list):
 
 if __name__ == "__main__":
     get_files()
-    print(filenames)
     first_file = create_dict(filenames[0])
     second_file = create_dict(filenames[1])
     set_of_names = create_set_of_names(filenames[0]['name'], filenames[1]['name'])
