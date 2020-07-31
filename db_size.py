@@ -4,9 +4,6 @@ import os
 from datetime import date
 from os import walk
 
-
-file1 = '18112019.csv'
-file2 = '28022020.csv'
 filenames = []
 
 def get_files():
@@ -56,7 +53,6 @@ def create_dict(input_file):
         filereader = csv.DictReader(csvfile)
         db_date = str(input_file['date'])
         for row in filereader:
-            #print(row['database_name'])
             result.append({'db_name': row['database_name'], db_date: row['size']})
     return result
 
@@ -68,7 +64,6 @@ def create_set_of_names(*args):
         with open(input_file, 'r') as csvfile:
             filereader = csv.DictReader(csvfile)
             for row in filereader:
-                #print(row['database_name'])
                 set_of_names.add(row['database_name'])
     list_of_names = sorted(set_of_names)
     return list_of_names
@@ -126,14 +121,6 @@ def create_result_csv(result_list):
     return result_list
 
 
-#def create_result_csv(*args, list_of_db_names):
-#    result_dict = []
-#    for input_file in args:
-#        for name in list_of_db_names:
-#            date = os.path.splitext(list_of_db_names)[0]
-#            result_dict.append({'db_name': name, date: j})
-
-
 def output_csv(result_list):
     #создает результирующий csv-файл
     csv_columns = ['db_name', str(filenames[0]['date']), str(filenames[1]['date']), 'delta']
@@ -146,13 +133,6 @@ def output_csv(result_list):
                 writer.writerow(data)
     except IOError:
         print('I/O Error')
-
-# list_of_names = create_set_of_names(file1, file2)
-# print(list_of_names)
-
-#result_list = create_result_csv(dblist1, dblist2)
-#output_csv(result_list)
-
 
 if __name__ == "__main__":
     get_files()
