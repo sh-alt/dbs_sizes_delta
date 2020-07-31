@@ -52,11 +52,11 @@ def hreadeble_size(size):
 def create_dict(input_file):
     #создаёт список словарей формата [{"db_name": название_бд, дата: размер_бд}]
     result = []
-    with open(input_file, 'r') as csvfile:
+    with open(input_file['name'], 'r') as csvfile:
         filereader = csv.DictReader(csvfile)
-        db_date = str(input_file[:-4])
+        db_date = str(input_file['date'])
         for row in filereader:
-            print(row['database_name'])
+            #print(row['database_name'])
             result.append({'db_name': row['database_name'], db_date: row['size']})
     return result
 
@@ -68,29 +68,36 @@ def create_set_of_names(*args):
         with open(input_file, 'r') as csvfile:
             filereader = csv.DictReader(csvfile)
             for row in filereader:
-                print(row['database_name'])
+                #print(row['database_name'])
                 set_of_names.add(row['database_name'])
     list_of_names = sorted(set_of_names)
     return list_of_names
 
 
-def copy_list(list1, list2):
+def copy_list(list1, list2, set_of_names):
     #копирование списка словарей list2 в list1 построчно
-    result_list = list1
-    for row in result_list:
-        row['28022020'] = '0 kB'
-    for row in list2:
-        added = False
+    result_list = []
+    #заполняет нулями столбец с данными о размерах БД за последний месяц
+    for item in set_of_names:
+        d = {}
+        d['db_name'] = item
+        d[str(filenames[0]['date'])] = '0 kB'
+        d[str(filenames[1]['date'])] = '0 kB'
+        result_list.append(d)
+    #построчно проходит по значениям столбца с ранними значениями
+    #если находит имя БД 
+    for row in list1:
         for result_row in result_list:
             if row['db_name'] == result_row['db_name']:
                 date = list(row.items())[1][0]
                 size = list(row.items())[1][1]
                 result_row[date] = size
-                added = True
-                continue
-    if not added:
-        result_list.append(row)
-        added = True
+    for row in list2:
+        for result_row in result_list:
+            if row['db_name'] == result_row['db_name']:
+                date = list(row.items())[1][0]
+                size = list(row.items())[1][1]
+                result_row[date] = size
     return result_list
    
 
@@ -99,14 +106,16 @@ def deltaFunc(csv_list):
     return csv_list['delta']
 
 
-def create_result_csv(list1, list2):
-    result_list = copy_list(list1, list2)
-    total = {'18112019': 0, '28022020': 0, 'delta': 0}
+def create_result_csv(result_list):
+    first_date = str(filenames[0]['date'])
+    second_date = str(filenames[1]['date'])
+    total = {first_date: 0, second_date: 0, 'delta': 0}
+    #подставил даты в названия столбцов
     for result_row in result_list:
-        delta = normalize_data_size(result_row['28022020']) - normalize_data_size(result_row['18112019'])
+        delta = normalize_data_size(result_row[second_date]) - normalize_data_size(result_row[first_date])
         result_row['delta'] = delta
-        total['18112019'] += normalize_data_size(result_row['18112019'])
-        total['28022020'] += normalize_data_size(result_row['28022020'])
+        total[first_date] += normalize_data_size(result_row[first_date])
+        total[second_date] += normalize_data_size(result_row[second_date])
         total['delta'] += delta
     result_list.sort(reverse=True, key=deltaFunc)
     for k, v in total.items():
@@ -127,7 +136,7 @@ def create_result_csv(list1, list2):
 
 def output_csv(result_list):
     #создает результирующий csv-файл
-    csv_columns = ['db_name', '18112019', '28022020', 'delta']
+    csv_columns = ['db_name', str(filenames[0]['date']), str(filenames[1]['date']), 'delta']
     csv_file = 'total.csv'
     try:
         with open(csv_file, 'w') as csvfile:
@@ -147,5 +156,11 @@ def output_csv(result_list):
 
 if __name__ == "__main__":
     get_files()
-    r = create_dict(filenames[0])
-    print(r)
+    print(filenames)
+    first_file = create_dict(filenames[0])
+    second_file = create_dict(filenames[1])
+    set_of_names = create_set_of_names(filenames[0]['name'], filenames[1]['name'])
+    copied_list = copy_list(first_file, second_file, set_of_names)
+    result_csv = create_result_csv(copied_list)
+    output_csv(result_csv)
+    
